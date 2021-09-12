@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
+import {useActions} from "./hooks/useActions";
+import PrivateRoute from "./Hoc/PrivateRoute";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+type Props = {
+
+};
+
+const LoginForm = lazy(() => import('./components/LoginForm'));
+const Users = lazy(() => import('./pages/Users'));
+
+const App = (props: Props) => {
+
+    const {logout} = useActions();
+
+    const logoutUser = () => {
+        logout()
+    }
+
+    return (
+        <>
+            <Router>
+                <div style={{display: 'flex'}}>
+                    <div style={{padding: 10}}>
+                        <Link to="/">Home</Link>
+                    </div>
+                    <div style={{padding: 10}}>
+                        <Link to="/users">users</Link>
+                    </div>
+                    <div style={{padding: 10}}>
+                        <button onClick={logoutUser}>Logout</button>
+                    </div>
+                </div>
+
+                <Suspense fallback={<div>Загрузка...</div>}>
+                    <Switch>
+                        <Route exact path="/" component={LoginForm}/>
+                        <PrivateRoute exact path="/users" component={Users}/>
+                    </Switch>
+                </Suspense>
+            </Router>
+        </>
+
+    );
+};
 
 export default App;
